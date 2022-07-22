@@ -74,7 +74,6 @@ def modelagem_deals(df, df_owner):
 
 df = modelagem_deals(df=df_deals, df_owner=df_owner)
 
-# df.to_csv('testefinal.csv')
 print(df)
 
 key = config['POSTGRE']['URL']
