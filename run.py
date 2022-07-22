@@ -2,17 +2,12 @@ from api import api_deals
 from owner import api_owner
 from datetime import date
 import hubspot
-from postgres import insert_postgre
+from postgres import insert_postgre, delete_postgres
 from config import *
+import time
 
 config = CatalogConfig()
 config.read()
-
-
-client = hubspot.Client.create(api_key=config['HUB']['URL'])
-
-df_deals = api_deals(client=client)
-df_owner = api_owner(client=client)
 
 
 def modelagem_deals(df, df_owner):
@@ -72,12 +67,16 @@ def modelagem_deals(df, df_owner):
     return df
 
 
-df = modelagem_deals(df=df_deals, df_owner=df_owner)
-
-print(df)
-
 key = config['POSTGRE']['URL']
+while True:
 
-df_dict = df.to_dict('records')
-insert_postgre(key_postgre=key, response=df_dict)
+    delete_postgres(key_postgre=key)
+    client = hubspot.Client.create(api_key=config['HUB']['URL'])
+    df_deals = api_deals(client=client)
+    df_owner = api_owner(client=client)
+    df = modelagem_deals(df=df_deals, df_owner=df_owner)
+    df_dict = df.to_dict('records')
+    insert_postgre(key_postgre=key, response=df_dict)
+    time.sleep(7200)
+
 
