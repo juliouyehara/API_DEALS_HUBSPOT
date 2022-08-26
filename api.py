@@ -1,13 +1,37 @@
 from hubspot.crm.deals import ApiException
 import pandas as pd
 
+import hubspot
+from pprint import pprint
+from hubspot.crm.properties import ApiException
+from config import *
+import time
+
+config = CatalogConfig()
+config.read()
+
+client = hubspot.Client.create(access_token=config['HUB']['AUTH'])
+
+try:
+    api_response = client.crm.properties.core_api.get_all(object_type="deals", archived=False)
+    # pprint(api_response)
+except ApiException as e:
+    print("Exception when calling core_api->get_all: %s\n" % e)
+
+api = vars(api_response)
+lista_properties = []
+for i in range(len(api['_results'])):
+    api_var = vars(api['_results'][i])
+    # pprint(api_var['_name'])
+    lista_properties.append(api_var['_name'])
+
 lista_hubspot = []
 
 
 def api_deals(client):
 
     try:
-        api_response = client.crm.deals.basic_api.get_page(limit=100,properties=["hubspot_owner_id","dealname","createdate","closedate","amount", "valor_de_implantacao__automatico_", "hs_tcv", "implantacao__typeform____manual", "condicoes_comerciais___implantacao",  "dealstage", 'pipeline'], archived=False)
+        api_response = client.crm.deals.basic_api.get_page(limit=100,properties=["cnpj", "hubspot_owner_id","dealname","createdate","closedate","amount", "valor_de_implantacao__automatico_", "hs_tcv", "implantacao__typeform____manual", "condicoes_comerciais___implantacao",  "dealstage", 'pipeline'], archived=False)
         api_var = vars(api_response)
         api_paging = api_var['_paging']
         api_paging = vars(api_paging)
@@ -75,6 +99,10 @@ def api_deals(client):
                 api_implatacao_auto = api_properties['valor_de_implantacao__automatico_']
             except:
                 api_implatacao_auto = ''
+            try:
+                api_cnpj = api_properties['cnpj']
+            except:
+                api_cnpj = ''
             dict.update({'id': api_id,
                          'amount': api_amount,
                          'close date': api_close_date,
@@ -88,7 +116,8 @@ def api_deals(client):
                          'condicoes': api_condicoes,
                          'total contrato': api_total_contract,
                          'implatacao typeform': api_implatacao_typeform,
-                         'implatacao automatica': api_implatacao_auto})
+                         'implatacao automatica': api_implatacao_auto,
+                         'cnpj': api_cnpj})
             lista_hubspot.append(dict)
 
     except ApiException as e:
@@ -96,7 +125,7 @@ def api_deals(client):
 
     while paging is not None:
         try:
-            api_response = client.crm.deals.basic_api.get_page(limit=100, after=paging, properties=["hubspot_owner_id", "dealname", "createdate", "closedate", "amount", 'valor_de_implantacao__automatico_', "hs_tcv", "implantacao__typeform____manual", "condicoes_comerciais___implantacao", "dealstage", 'pipeline'], archived=False)
+            api_response = client.crm.deals.basic_api.get_page(limit=100, after=paging, properties=["cnpj", "hubspot_owner_id", "dealname", "createdate", "closedate", "amount", 'valor_de_implantacao__automatico_', "hs_tcv", "implantacao__typeform____manual", "condicoes_comerciais___implantacao", "dealstage", 'pipeline'], archived=False)
             api_var = vars(api_response)
             api_paging = api_var['_paging']
             try:
@@ -168,6 +197,10 @@ def api_deals(client):
                     api_implatacao_auto = api_properties['valor_de_implantacao__automatico_']
                 except:
                     api_implatacao_auto = ''
+                try:
+                    api_cnpj = api_properties['cnpj']
+                except:
+                    api_cnpj = ''
                 dict.update({'id': api_id,
                              'amount': api_amount,
                              'close date': api_close_date,
@@ -181,7 +214,8 @@ def api_deals(client):
                              'condicoes': api_condicoes,
                              'total contrato': api_total_contract,
                              'implatacao typeform': api_implatacao_typeform,
-                             'implatacao automatica': api_implatacao_auto})
+                             'implatacao automatica': api_implatacao_auto,
+                             'cnpj': api_cnpj})
                 lista_hubspot.append(dict)
         except ApiException as e:
             print("Exception when calling basic_api->get_page: %s\n" % e)

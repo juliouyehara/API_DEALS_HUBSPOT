@@ -64,19 +64,28 @@ def modelagem_deals(df, df_owner):
             nome = 'Não encontrado'
         lista.append(nome)
     df['owner'] = lista
+    lista = []
+    lista = []
+    for i in df['deal name']:
+        i = str(i).upper()
+        i = i.strip()
+        lista.append(i)
+    df['deal name'] = lista
     return df
 
 
-key = config['POSTGRE']['URL']
-while True:
+key = config['POSTGRES']['URL']
+# while True:
 
-    delete_postgres(key_postgre=key)
-    client = hubspot.Client.create(api_key=config['HUB']['URL'])
-    df_deals = api_deals(client=client)
-    df_owner = api_owner(client=client)
-    df = modelagem_deals(df=df_deals, df_owner=df_owner)
-    df_dict = df.to_dict('records')
-    insert_postgre(key_postgre=key, response=df_dict)
-    time.sleep(7200)
+# delete_postgres(key_postgre=key)
+client = hubspot.Client.create(access_token=config['HUB']['URL'])
+df_deals = api_deals(client=client)
+df_owner = api_owner(client=client)
+df = modelagem_deals(df=df_deals, df_owner=df_owner)
+print(df)
+df.to_csv('api_hub.csv')
+# df_dict = df.to_dict('records')
+# insert_postgre(key_postgre=key, response=df_dict)
+# time.sleep(7200)
 
 

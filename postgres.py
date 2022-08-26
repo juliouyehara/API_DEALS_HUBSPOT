@@ -4,7 +4,7 @@ import psycopg2.extras
 def delete_postgres(key_postgre):
     connection = pg.connect(key_postgre)
     curs = connection.cursor()
-    postgre_query = """DELETE FROM accountify_omie ROWS"""
+    postgre_query = """DELETE FROM api_hub ROWS"""
     curs.execute(postgre_query)
     connection.commit()
     connection.close()

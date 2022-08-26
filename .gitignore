@@ -70,4 +70,11 @@ target/
 vault/*
 teste.py
 env.yaml
+token.json
+propriedade.csv
+propriedade_pipe.csv
+testepropriedade.csv
+contato.csv
+api_hub.csv
+.csv
 
